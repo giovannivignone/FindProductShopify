@@ -1,6 +1,5 @@
 def Findproduct(keywords,dotcomesitelink,needed_size,monitor_delay):
-   """This function takes keywords and a json scraping link 
-   (https://www.kith.com/products.json) and a site link (https://www.kith.com)
+   """This function takes keywords and a site link (https://www.kith.com)
    and returns the productlink and id based off a sorting system"""
    lstlower = [l for l in "abcdefghijklmnopqrstuvwxyz0123456789"]
    lstupper = [le for le in "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"]
