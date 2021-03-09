@@ -1,0 +1,56 @@
+def Findproduct(keywords,dotcomesitelink,needed_size,monitor_delay):
+   """This function takes keywords and a json scraping link 
+   (https://www.kith.com/products.json) and a site link (https://www.kith.com)
+   and returns the productlink and id based off a sorting system"""
+   lstlower = [l for l in "abcdefghijklmnopqrstuvwxyz0123456789"]
+   lstupper = [le for le in "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"]
+   x = re.split(', \\+|\\+',keywords,)
+      lstkeywords = [w for w in x if w!=""]
+   retlstkeywords = []
+   for word in lstkeywords:
+       retlstkeywords.append(word)
+       if word[0] in lstlower:
+           word1 = lstupper[lstlower.index(word[0])] + word[1:]
+           retlstkeywords.append(word1)
+       elif word[0] in lstupper:
+           word1 = lstlower[lstupper.index(word[0])] + word[1:]
+           retlstkeywords.append(word1)
+       capitalizedword = ""
+       for let in word:
+           try:
+               newlet = lstupper[lstlower.index(let)]
+               capitalizedword += newlet
+           except ValueError:
+               capitalizedword += let
+               continue
+       if capitalizedword not in retlstkeywords:
+           retlstkeywords.append(capitalizedword)
+   scrape = dotcomesitelink + "/products.json"
+   product = {}
+   print(retlstkeywords)
+   while len(product) == 0:
+       r = requests.get(scrape)
+       products = json.loads(r.text)['products']
+       print("Monitoring for product")
+       for prod in products:
+           variants = prod["variants"]
+           name = prod["title"]
+           sizes = []
+           for varr in variants:
+               if varr["available"] == True:
+                   size = varr["title"]
+                   identifier = varr["id"]
+                   sizes.append((size,identifier))
+           cont = 0
+           for word in retlstkeywords:
+               if word in name:
+                   cont +=1
+           if cont >= len(lstkeywords):
+               for tup in sizes:
+                   if needed_size == tup[0]:
+                       link = dotcomesitelink + "/products/" + prod["handle"]
+                       product[name] = [link, needed_size, tup[1]]
+                       print(product)
+                       print("Carting item")
+                       return (product[name][0],product[name][-1])
+       time.sleep(monitor_delay)
